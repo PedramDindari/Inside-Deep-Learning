@@ -45,7 +45,7 @@ def run_epoch(model, optimizer, data_loader, loss_func, device, results, score_f
     device -- the compute lodation to perform training
     score_funcs -- a dictionary of scoring functions to use to evalue the performance of the model
     prefix -- a string to pre-fix to any scores placed into the _results_ dictionary. 
-    desc -- a description to use for the progress bar.     
+    desc -- a description to use for the progress bar. 
     """
     running_loss = []
     y_true = []
@@ -120,9 +120,10 @@ def train_simple_network(model, loss_func, train_loader, test_loader=None, score
         results[item] = []
         
     #SGD is Stochastic Gradient Decent.
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
+    optimizer = torch.optim.SGD(model.parameters(), lr=lr) # Keep lr as argument
     #Place the model on the correct compute resource (CPU or GPU)
-    model.to(device)
+    model.to(device) # Move model to device
+
     for epoch in tqdm(range(epochs), desc="Epoch"):
         model = model.train()#Put our model in training mode
         
@@ -159,7 +160,7 @@ class View(nn.Module):
         super(View, self).__init__()
         self.shape = shape
     def forward(self, input):
-        return input.view(*self.shape) 
+        return input.view(*self.shape)
     
 class LambdaLayer(nn.Module):
     def __init__(self, lambd):
@@ -257,7 +258,8 @@ def train_network(model, loss_func, train_loader, val_loader=None, test_loader=N
         del_opt = False
 
     #Place the model on the correct compute resource (CPU or GPU)
-    model.to(device)
+    model.to(device) # Move model to device
+    
     for epoch in tqdm(range(epochs), desc="Epoch", disable=disable_tqdm):
         model = model.train()#Put our model in training mode
 
@@ -310,7 +312,7 @@ class LastTimeStep(nn.Module):
         if bidirectional:
             self.num_driections = 2
         else:
-            self.num_driections = 1    
+            self.num_driections = 1
     
     def forward(self, input):
         #Result is either a tupe (out, h_t)
@@ -324,7 +326,7 @@ class LastTimeStep(nn.Module):
         
         last_step = last_step.view(self.rnn_layers, self.num_driections, batch_size, -1)
         #We want the last layer's results
-        last_step = last_step[self.rnn_layers-1] 
+        last_step = last_step[self.rnn_layers-1]
         #Re order so batch comes first
         last_step = last_step.permute(1, 0, 2)
         #Finally, flatten the last two dimensions into one
@@ -339,7 +341,7 @@ class EmbeddingPackable(nn.Module):
     """
     def __init__(self, embd_layer):
         super(EmbeddingPackable, self).__init__()
-        self.embd_layer = embd_layer 
+        self.embd_layer = embd_layer
     
     def forward(self, input):
         if type(input) == torch.nn.utils.rnn.PackedSequence:
